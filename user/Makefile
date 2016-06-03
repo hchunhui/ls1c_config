@@ -33,11 +33,12 @@ iptables:
 	tar Cczvf $(IPTABLES)/install out/$@.tgz usr --exclude="pkgconfig" --exclude "include"
 	touch $@
 
-ppp:
+ppp: libpcap
 	tar xvf $(SOURCE)/$(PPP).tar.gz
 	cd $(PPP) && \
 	./configure && \
-	sed -i 's/^FILTER=y//g' pppd/Makefile && \
+	sed -i 's%-lpcap$$%-L../../$(LIBPCAP) -lpcap%g' pppd/Makefile && \
+	sed -i 's%-DPPP_FILTER$$%-I../../$(LIBPCAP) -DPPP_FILTER%g' pppd/Makefile && \
 	make CC=$(HOST)-gcc && \
 	$(HOST)-strip pppd/pppd
 	touch $@
@@ -74,7 +75,7 @@ openssh: openssl
 libpcap:
 	tar xvf $(SOURCE)/$(LIBPCAP).tar.gz
 	cd $(LIBPCAP) && \
-	./configure --host=$(HOST) && \
+	./configure --host=$(HOST) --disable-shared && \
 	make
 	touch $@
 
