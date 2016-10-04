@@ -4,6 +4,7 @@ SOURCE=$(PWD)/pkg
 DROPBEAR=dropbear-2016.73
 IPTABLES=iptables-1.4.21
 PPP=ppp-2.4.7
+PPTP=pptp-1.8.0
 RP_PPPOE=rp-pppoe-3.11
 OPENSSL=openssl-1.0.2h
 OPENSSH=openssh-7.2p2
@@ -51,6 +52,13 @@ rp_pppoe: ppp
 	make DESTDIR=$$PWD/install install
 	cp $(PPP)/pppd/pppd $(RP_PPPOE)/src/install/usr/sbin/
 	tar Cczvf $(RP_PPPOE)/src/install out/$@.tgz usr #etc
+	touch $@
+
+pptp:
+	tar xvf $(SOURCE)/$(PPTP).tar.gz
+	cd $(PPTP) && \
+	make CC=$(HOST)-gcc && \
+	$(HOST)-strip pptp
 	touch $@
 
 OPENSSL_TARGET=linux-mips32
